@@ -40,6 +40,14 @@ public class UserController {
         return Response.ok(userService.updateUser(userId, userEntity)).build();
     }
 
+    @DELETE
+    @Transactional
+    @Path("/{id}")
+    public Response deleteById(@PathParam("id") UUID userId) {
+        userService.deleteById(userId);
+        return Response.noContent().build();
+    }
+
     @GET
     @Path("/{id}")
     public Response getById(@PathParam("id") UUID userId) {

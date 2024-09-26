@@ -3,31 +3,44 @@ package service;
 import entity.UserEntity;
 import exception.UserNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
+import repository.UserRepository;
 
 import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
 public class UserService {
+
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     public UserEntity createUser(UserEntity userEntity) {
-        UserEntity.persist(userEntity);
+        userRepository.persist(userEntity);
         return userEntity;
     }
 
     public List<UserEntity> findAll(Integer page, Integer pageSize) {
-        return UserEntity.findAll()
+        return userRepository.findAll()
                 .page(page, pageSize)
                 .list();
     }
 
     public UserEntity findById(UUID userId) {
-        return (UserEntity) UserEntity.findByIdOptional(userId).orElseThrow(UserNotFoundException::new);
+        return (UserEntity) userRepository.findByIdOptional(userId).orElseThrow(UserNotFoundException::new);
     }
 
     public UserEntity updateUser(UUID userId, UserEntity userEntity) {
         var user = findById(userId);
-        user.userName = userEntity.userName;
-        UserEntity.persist(user);
+        user.setUserName(userEntity.getUserName());
+        userRepository.persist(user);
         return user;
+    }
+
+    public void deleteById(UUID userId) {
+        var user = findById(userId);
+        userRepository.deleteById(user.getUserId());
     }
 }
